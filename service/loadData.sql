@@ -3,62 +3,59 @@ DROP TABLE IF EXISTS questions CASCADE;
 DROP TABLE IF EXISTS answers CASCADE;
 DROP TABLE IF EXISTS photos CASCADE;
 
-
-CREATE TABLE IF NOT EXISTS products (
-  product_id SERIAL GENERATED ALWAYS AS IDENTITY,
-  PRIMARY KEY (product_id)
+CREATE TABLE products (
+  id BIGSERIAL PRIMARY KEY,
+  name TEXT,
+  slogan TEXT,
+  description TEXT,
+  category TEXT,
+  default_price INT
 );
 
-COPY products
-FROM '/Users/tylertowery/Desktop/HackReactor/SDC/qa_service/files/product.csv'
-WITH (FORMAT csv, HEADER true);
+CREATE INDEX product_idx ON products (id);
+
+\COPY products FROM '../files/product.csv' DELIMITER ',' CSV HEADER;
 
 CREATE TABLE questions (
-  product_id INT,
-  question_id SERIAL GENERATED ALWAYS AS IDENTITY,
-  question_body TEXT,
-  question_date TEXT,
+  id BIGSERIAL PRIMARY KEY,
+  product_id BIGINT REFERENCES products (id),
+  body TEXT,
+  date_written BIGINT,
   asker_name TEXT,
   asker_email TEXT,
-  question_helpfulness SMALLINT,
   reported BOOLEAN,
-  PRIMARY KEY (question_id),
-  CONSTRAINT fk_product,
-    FOREIGN KEY (product_id)
-      REFERENCES products(product_id)
+  helpful SMALLINT
 );
 
-COPY questions
-FROM '/Users/tylertowery/Desktop/HackReactor/SDC/qa_service/files/questions.csv'
-WITH (FORMAT csv, HEADER true);
+CREATE INDEX question_idx on questions (id);
+
+\COPY questions FROM '../files/questions.csv' DELIMITER ',' CSV HEADER;
 
 CREATE TABLE answers (
-  question_id INT,
-  answer_id SERIAL GENERATED ALWAYS AS IDENTITY,
-  answer_body TEXT,
-  answer_date TEXT,
+  id BIGSERIAL PRIMARY KEY,
+  question_id BIGSERIAL REFERENCES questions (id),
+  body TEXT,
+  date_written BIGINT,
   answerer_name TEXT,
-  answer_helpfulness SMALLINT,
-  PRIMARY KEY (answer_id),
-  CONSTRAINT fk_question,
-    FOREIGN KEY (question_id)
-      REFERENCES questions(question_id)
+  answerer_email TEXT,
+  reported BOOLEAN,
+  helpful SMALLINT
 );
 
-COPY answers
-FROM '/Users/tylertowery/Desktop/HackReactor/SDC/qa_service/files/answers.csv'
-WITH (FORMAT csv, HEADER true);
+CREATE INDEX answer_idx ON answers (id);
+
+\COPY answers FROM '../files/answers.csv' DELIMITER ',' CSV HEADER;
 
 CREATE TABLE photos (
-  answer_id INT ,
-  photo_id SERIAL GENERATED ALWAYS AS IDENTITY,
-  photo_url TEXT,
-  PRIMARY KEY (photo_id),
-  CONSTRAINT fk_answer,
-    FOREIGN KEY (answer_id)
-      REFERENCES answers(answer_id)
+  id BIGINT PRIMARY KEY,
+  answer_id BIGSERIAL REFERENCES answers (id),
+  photo_url TEXT
 );
 
-COPY photos
-FROM '/Users/tylertowery/Desktop/HackReactor/SDC/qa_service/files/answers_photos.csv'
-WITH (FORMAT csv, HEADER true);
+CREATE INDEX photo_idx ON photos (id);
+
+\COPY photos FROM '../files/answers_photos.csv' DELIMITER ',' CSV HEADER;
+
+ALTER TABLE questions ALTER COLUMN date_written TYPE timestamp USING to_timestamp(date_written / 1000);
+
+ALTER TABLE answers ALTER COLUMN date_written TYPE timestamp USING to_timestamp(date_written / 1000);
