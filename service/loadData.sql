@@ -1,3 +1,9 @@
+DROP DATABSE IF EXISTS productdata;
+
+CREATE DATABASE productdata;
+
+\c productdata;
+
 DROP TABLE IF EXISTS products CASCADE;
 DROP TABLE IF EXISTS questions CASCADE;
 DROP TABLE IF EXISTS answers CASCADE;
@@ -27,7 +33,7 @@ CREATE TABLE questions (
   helpful SMALLINT
 );
 
-CREATE INDEX question_idx on questions (id);
+CREATE INDEX question_idx on questions (product_id);
 
 \COPY questions FROM '../files/questions.csv' DELIMITER ',' CSV HEADER;
 
@@ -42,7 +48,7 @@ CREATE TABLE answers (
   helpful SMALLINT
 );
 
-CREATE INDEX answer_idx ON answers (id);
+CREATE INDEX answer_idx ON answers (question_id);
 
 \COPY answers FROM '../files/answers.csv' DELIMITER ',' CSV HEADER;
 
@@ -52,7 +58,7 @@ CREATE TABLE photos (
   photo_url TEXT
 );
 
-CREATE INDEX photo_idx ON photos (id);
+CREATE INDEX photo_idx ON photos (answer_id);
 
 \COPY photos FROM '../files/answers_photos.csv' DELIMITER ',' CSV HEADER;
 

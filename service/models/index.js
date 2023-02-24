@@ -9,7 +9,9 @@ client.connect();
 
 module.exports = {
   readAnswers(questionid, page = 1, count = 5) {
-    const query = `SELECT json_build_object(
+    const query = {
+      name: `fetch ${questionid}`,
+      text: `SELECT json_build_object(
         'question', ${questionid},
         'page', 1,
         'count', 5,
@@ -32,7 +34,8 @@ module.exports = {
             LIMIT ${count} OFFSET ${page}
           ) answers
         )
-      )`;
+      )`,
+    };
 
     return client.query(query);
   },
@@ -40,7 +43,7 @@ module.exports = {
   updateHelpfulQuestion(questionid, page = 1, count = 5) {
     const query = {
       name: 'udpate-helpful-question',
-      text: ``,
+      text: '',
       values: [questionid],
     };
     return client.query(query, query.values);
