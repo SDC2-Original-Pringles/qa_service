@@ -6,7 +6,7 @@ const client = new Client({
   host: process.env.HOST,
   password: process.env.PW,
   db: process.env.DB,
-  port: process.env.PORT,
+  port: process.env.DBPORT,
 });
 client.connect();
 
